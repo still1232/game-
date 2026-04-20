@@ -50,7 +50,14 @@ class Enemy:
     def load_sprites(self):
         """Load enemy sprites from external sprite sheet (Noita-like style)"""
         import os
-        asset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'enemy_sprites.png')
+        # Load different sprite sheets based on enemy type
+        if self.enemy_type == 'slime':
+            asset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'enemy_slime.png')
+        elif self.enemy_type == 'fly':
+            asset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'enemy_fly.png')
+        else:
+            asset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'enemy_sprite.png')
+        
         try:
             sprite_sheet = pygame.image.load(asset_path).convert_alpha()
             # Extract frames from sprite sheet (assuming 16x16 pixel frames)

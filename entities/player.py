@@ -50,7 +50,7 @@ class Player:
     def load_sprites(self):
         """Load player sprites from external sprite sheet (Noita-like style)"""
         import os
-        asset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'player_sprites.png')
+        asset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'player_sprite.png')
         try:
             sprite_sheet = pygame.image.load(asset_path).convert_alpha()
             # Extract frames from sprite sheet (assuming 16x16 pixel frames)
