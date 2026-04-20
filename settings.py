@@ -8,6 +8,7 @@ TILE_SIZE = 4  # Mỗi pixel game = 4x4 screen pixels
 WORLD_WIDTH = 512  # Số pixel ngang
 WORLD_HEIGHT = 256  # Số pixel dọc
 CHUNK_SIZE = 64  # Kích thước chunk
+UPDATE_RADIUS = 100  # Chỉ update vùng gần player (giảm lag)
 
 # Physics
 GRAVITY = 0.5
@@ -32,20 +33,26 @@ SMOKE = 7
 ASH = 8
 ACID = 9
 ICE = 10
+GRASS = 11
+DIRT = 12
+GOLD = 13
 
-# Material properties
+# Material properties với texture regions
 MATERIAL_PROPS = {
-    AIR: {'name': 'air', 'solid': False, 'liquid': False, 'gas': False, 'flammable': False, 'color': (0, 0, 0, 0)},
-    SAND: {'name': 'sand', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (235, 200, 115, 255)},
-    WATER: {'name': 'water', 'solid': False, 'liquid': True, 'gas': False, 'flammable': False, 'color': (64, 164, 223, 200)},
-    LAVA: {'name': 'lava', 'solid': False, 'liquid': True, 'gas': False, 'flammable': True, 'color': (207, 16, 32, 255), 'heat': 100},
-    STONE: {'name': 'stone', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (128, 128, 128, 255)},
-    WOOD: {'name': 'wood', 'solid': True, 'liquid': False, 'gas': False, 'flammable': True, 'color': (139, 90, 43, 255)},
-    FIRE: {'name': 'fire', 'solid': False, 'liquid': False, 'gas': True, 'flammable': False, 'color': (255, 100, 0, 255), 'heat': 50, 'lifetime': 30},
-    SMOKE: {'name': 'smoke', 'solid': False, 'liquid': False, 'gas': True, 'flammable': False, 'color': (100, 100, 100, 150), 'lifetime': 60},
-    ASH: {'name': 'ash', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (80, 80, 80, 255)},
-    ACID: {'name': 'acid', 'solid': False, 'liquid': True, 'gas': False, 'flammable': False, 'color': (100, 255, 50, 200)},
-    ICE: {'name': 'ice', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (200, 230, 255, 255)},
+    AIR: {'name': 'air', 'solid': False, 'liquid': False, 'gas': False, 'flammable': False, 'color': (0, 0, 0, 0), 'texture_rect': None},
+    SAND: {'name': 'sand', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (235, 200, 115, 255), 'texture_rect': (0, 0, 16, 16)},
+    WATER: {'name': 'water', 'solid': False, 'liquid': True, 'gas': False, 'flammable': False, 'color': (64, 164, 223, 200), 'texture_rect': (16, 0, 16, 16)},
+    LAVA: {'name': 'lava', 'solid': False, 'liquid': True, 'gas': False, 'flammable': True, 'color': (207, 16, 32, 255), 'heat': 100, 'texture_rect': (32, 0, 16, 16)},
+    STONE: {'name': 'stone', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (128, 128, 128, 255), 'texture_rect': (48, 0, 16, 16)},
+    WOOD: {'name': 'wood', 'solid': True, 'liquid': False, 'gas': False, 'flammable': True, 'color': (139, 90, 43, 255), 'texture_rect': (64, 0, 16, 16)},
+    FIRE: {'name': 'fire', 'solid': False, 'liquid': False, 'gas': True, 'flammable': False, 'color': (255, 100, 0, 255), 'heat': 50, 'lifetime': 30, 'texture_rect': (80, 0, 16, 16)},
+    SMOKE: {'name': 'smoke', 'solid': False, 'liquid': False, 'gas': True, 'flammable': False, 'color': (100, 100, 100, 150), 'lifetime': 60, 'texture_rect': (96, 0, 16, 16)},
+    ASH: {'name': 'ash', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (80, 80, 80, 255), 'texture_rect': (112, 0, 16, 16)},
+    ACID: {'name': 'acid', 'solid': False, 'liquid': True, 'gas': False, 'flammable': False, 'color': (100, 255, 50, 200), 'texture_rect': (128, 0, 16, 16)},
+    ICE: {'name': 'ice', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (200, 230, 255, 255), 'texture_rect': (144, 0, 16, 16)},
+    GRASS: {'name': 'grass', 'solid': True, 'liquid': False, 'gas': False, 'flammable': True, 'color': (34, 139, 34, 255), 'texture_rect': (160, 0, 16, 16)},
+    DIRT: {'name': 'dirt', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (101, 67, 33, 255), 'texture_rect': (176, 0, 16, 16)},
+    GOLD: {'name': 'gold', 'solid': True, 'liquid': False, 'gas': False, 'flammable': False, 'color': (255, 215, 0, 255), 'texture_rect': (192, 0, 16, 16)},
 }
 
 # Reactions
@@ -55,4 +62,6 @@ REACTIONS = {
     (ACID, STONE): SAND,
     (ACID, WOOD): ASH,
     (LAVA, WATER): STONE,
+    (FIRE, GRASS): ASH,
+    (LAVA, GRASS): STONE,
 }

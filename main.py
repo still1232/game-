@@ -252,12 +252,14 @@ class Game:
             self.last_fps_update = current_time
             
     def render(self):
-        """Render everything"""
+        """Render everything - OPTIMIZED"""
         # Clear screen
         self.renderer.clear()
         
-        # Render world
-        self.renderer.render_world(self.world)
+        # Render world with optimized method (only around player)
+        player_center_x = self.player.x + self.player.width // 2
+        player_center_y = self.player.y + self.player.height // 2
+        self.renderer.render_world_optimized(self.world, player_center_x, player_center_y)
         
         # Render enemies
         for enemy in self.enemies:
@@ -282,25 +284,10 @@ class Game:
         self.renderer.screen.blit(text, (20, 110))
         
         # Render brush info
-        text = font.render(f"Brush: {self.brush_material} | Size: {self.brush_size}", True, (255, 255, 255))
+        text = font.render(f"Brush: {MATERIAL_PROPS.get(self.brush_material, {}).get('name', '?')} | Size: {self.brush_size}", True, (255, 255, 255))
         self.renderer.screen.blit(text, (20, 130))
         
-        # Render FPS
-        text = font.render(f"FPS: {self.fps_counter}", True, (255, 255, 0))
-        self.renderer.screen.blit(text, (SCREEN_WIDTH - 100, 20))
-        
-        # Render pause message
-        if self.paused:
-            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 128))
-            self.renderer.screen.blit(overlay, (0, 0))
-            
-            font_large = pygame.font.Font(None, 72)
-            text = font_large.render("PAUSED", True, (255, 255, 255))
-            text_rect = text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
-            self.renderer.screen.blit(text, text_rect)
-            
-        # Update display
+        # Update display - FPS counter is now in renderer
         pygame.display.flip()
         
     def shoot(self):
