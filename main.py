@@ -23,7 +23,10 @@ class Game:
     def __init__(self):
         # Initialize pygame
         pygame.init()
-        pygame.mixer.init()
+        try:
+            pygame.mixer.init()
+        except Exception:
+            print("Warning: Audio not available, running without sound")
         
         # Create renderer
         self.renderer = Renderer(SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE)
