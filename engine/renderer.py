@@ -123,12 +123,14 @@ class Renderer:
         self.last_visible_range = None
         
     def _load_assets(self):
-        """Load all assets"""
-        self.assets.load_tileset('tileset.png', 16)
+        """Load all assets from external sprite sheets (Noita-like style)"""
+        # Load tileset for terrain materials
+        self.assets.load_tileset('tileset_sheet.png', 16)
         self.assets.load_tileset('cave_tileset.png', 16)
-        # Player and enemy sprites will use fallback colored rectangles if not found
-        self.assets.load_sprite('player_sprite.png', 'player')
-        self.assets.load_sprite('enemy_sprite.png', 'enemy')
+        
+        # Load character sprites
+        self.assets.load_sprite('player_sprites.png', 'player')
+        self.assets.load_sprite('enemy_sprites.png', 'enemy')
         
     def set_camera(self, x, y, world_width=WORLD_WIDTH, world_height=WORLD_HEIGHT):
         """Set camera position with bounds checking - smooth follow"""

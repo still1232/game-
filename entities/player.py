@@ -43,27 +43,53 @@ class Player:
         self.anim_frame = 0
         self.anim_timer = 0
         
-        # Load sprite (placeholder - will be replaced with actual sprite)
-        self.sprite = None
-        self.load_sprite()
+        # Sprite frames (loaded from sprite sheet)
+        self.sprites = []
+        self.load_sprites()
         
-    def load_sprite(self):
-        """Load player sprite from assets or create placeholder"""
-        # Create simple sprite programmatically
-        self.sprite = pygame.Surface((self.width * TILE_SIZE, self.height * TILE_SIZE), pygame.SRCALPHA)
-        # Body
-        pygame.draw.rect(self.sprite, (100, 150, 255), 
+    def load_sprites(self):
+        """Load player sprites from external sprite sheet (Noita-like style)"""
+        import os
+        asset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'player_sprites.png')
+        try:
+            sprite_sheet = pygame.image.load(asset_path).convert_alpha()
+            # Extract frames from sprite sheet (assuming 16x16 pixel frames)
+            frame_width = 16
+            frame_height = 16
+            cols = sprite_sheet.get_width() // frame_width
+            
+            # Get multiple animation frames
+            for i in range(min(8, cols)):  # Load up to 8 frames
+                frame = sprite_sheet.subsurface(i * frame_width, 0, frame_width, frame_height)
+                # Scale to player size
+                frame = pygame.transform.scale(frame, (self.width * TILE_SIZE, self.height * TILE_SIZE))
+                self.sprites.append(frame)
+        except Exception as e:
+            print(f"Warning: Could not load player sprite sheet: {e}")
+            # Create fallback sprite
+            self._create_fallback_sprite()
+            
+    def _create_fallback_sprite(self):
+        """Create simple fallback sprite if external file fails"""
+        sprite = pygame.Surface((self.width * TILE_SIZE, self.height * TILE_SIZE), pygame.SRCALPHA)
+        pygame.draw.rect(sprite, (100, 150, 255), 
                         (TILE_SIZE, TILE_SIZE, self.width * TILE_SIZE - 2, self.height * TILE_SIZE - 2))
-        # Eyes
-        pygame.draw.circle(self.sprite, (255, 255, 255), 
+        pygame.draw.circle(sprite, (255, 255, 255), 
                           (int(self.width * TILE_SIZE * 0.7), int(self.height * TILE_SIZE * 0.3)), 4)
+        self.sprites.append(sprite)
         
     def get_sprite(self):
-        """Get current sprite"""
-        if not self.facing_right and self.sprite:
+        """Get current sprite with animation support"""
+        if not self.sprites:
+            return None
+            
+        # Get current animation frame
+        current_sprite = self.sprites[self.anim_frame % len(self.sprites)]
+        
+        if not self.facing_right:
             # Flip sprite if facing left
-            return pygame.transform.flip(self.sprite, True, False)
-        return self.sprite
+            return pygame.transform.flip(current_sprite, True, False)
+        return current_sprite
         
     def get_rect(self):
         """Get collision rectangle"""
